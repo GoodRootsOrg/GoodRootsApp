@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Link from "next/link";
+import { getRPCProviderOwner, getZeroDevSigner } from "@zerodevapp/sdk";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { BugAntIcon, MagnifyingGlassIcon, SparklesIcon } from "@heroicons/react/24/outline";
@@ -9,7 +10,11 @@ import { web3AuthInstance } from "~~/services/web3/wagmiConnectors";
 
 const Home: NextPage = () => {
   const setUserInfo = useGlobalState(state => state.setUserInfo);
-  const { connector } = useAccount();
+  const setUserSmartAccount = useGlobalState(state => state.setUserSmartAccount);
+  const setUserSigner = useGlobalState(state => state.setUserSigner);
+  const { address, connector } = useAccount();
+
+  const defaultProjectId = process.env.REACT_APP_ZERODEV_PROJECT_ID || "30b621f8-2152-48f1-9329-7d99661ddcf6";
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -25,6 +30,23 @@ const Home: NextPage = () => {
     };
     getUserInfo();
   }, [connector]);
+
+  useEffect(() => {
+    const tryZeroDevSigner = async () => {
+      if (web3AuthInstance && address) {
+        const tmpSigner = await getZeroDevSigner({
+          projectId: defaultProjectId,
+          owner: getRPCProviderOwner(web3AuthInstance.provider),
+        });
+        setUserSigner(tmpSigner);
+        const tmpAddress = await tmpSigner.getAddress();
+        if (tmpAddress) {
+          setUserSmartAccount(tmpAddress);
+        }
+      }
+    };
+    tryZeroDevSigner();
+  }, [address, defaultProjectId, setUserSigner, setUserSmartAccount]);
 
   return (
     <>

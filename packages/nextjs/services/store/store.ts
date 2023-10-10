@@ -1,4 +1,7 @@
+import { JsonRpcSigner } from "@ethersproject/providers";
 import { OpenloginUserInfo } from "@web3auth/openlogin-adapter";
+import { ZeroDevSigner } from "@zerodevapp/sdk";
+import { Address } from "viem";
 import create from "zustand";
 
 /**
@@ -15,6 +18,10 @@ type TGlobalState = {
   setNativeCurrencyPrice: (newNativeCurrencyPriceState: number) => void;
   userInfo: Partial<OpenloginUserInfo> | null;
   setUserInfo: (newUserInfo: Partial<OpenloginUserInfo>) => void;
+  userSmartAccount: Address | null;
+  setUserSmartAccount: (newAccount: Address | null) => void;
+  userSigner: JsonRpcSigner | ZeroDevSigner | null;
+  setUserSigner: (newSigner: JsonRpcSigner | ZeroDevSigner | null) => void;
 };
 
 export const useGlobalState = create<TGlobalState>(set => ({
@@ -22,4 +29,8 @@ export const useGlobalState = create<TGlobalState>(set => ({
   setNativeCurrencyPrice: (newValue: number): void => set(() => ({ nativeCurrencyPrice: newValue })),
   userInfo: null,
   setUserInfo: (newUserInfo: Partial<OpenloginUserInfo>): void => set(() => ({ userInfo: newUserInfo })),
+  userSmartAccount: null,
+  setUserSmartAccount: (newAccount: Address | null): void => set(() => ({ userSmartAccount: newAccount })),
+  userSigner: null,
+  setUserSigner: (newSigner: JsonRpcSigner | ZeroDevSigner | null): void => set(() => ({ userSigner: newSigner })),
 }));
